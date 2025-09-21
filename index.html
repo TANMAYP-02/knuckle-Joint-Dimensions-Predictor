@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Knuckle Joint Predictor</title>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f6;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 30px;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 28px;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+
+        label {
+            display: block;
+            margin-top: 18px;
+            font-size: 16px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            margin-top: 8px;
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background-color: #fff;
+            color: #333;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        input:focus {
+            border-color: #1a73e8;
+            box-shadow: 0 0 8px rgba(26, 115, 232, 0.4);
+            outline: none;
+        }
+
+        button {
+            padding: 12px 25px;
+            margin-top: 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 6px;
+            background-color: #1a73e8;
+            color: white;
+            font-weight: 500;
+            transition: background-color 0.3s, transform 0.2s ease-in-out;
+        }
+
+        button:hover {
+            background-color: #0c63d0;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            background-color: #0b4fa6;
+        }
+
+        button + button {
+            margin-left: 15px;
+        }
+
+        .output {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .output h3 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 15px;
+        }
+
+        table th,
+        table td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        table th {
+            background-color: #f4f7fa;
+            color: #555;
+            font-weight: 600;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #fafbfc;
+        }
+
+        table tr:hover {
+            background-color: #f1f3f6;
+        }
+
+        table td {
+            color: #333;
+        }
+
+        table td, table th {
+            padding: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Knuckle Joint Dimension Predictor</h1>
+
+    <label>Load (N):
+        <input type="number" id="load" step="any">
+    </label>
+    <label>Factor of Safety (Pin):
+        <input type="number" id="fos_pin" step="any">
+    </label>
+    <label>Factor of Safety (Eye):
+        <input type="number" id="fos_eye" step="any">
+    </label>
+
+    <button onclick="calculate()">Calculate</button>
+    <button onclick="clearFields()">Clear</button>
+
+    <div class="output" id="output"></div>
+
+    <script>
+        function calculate() {
+            const load = parseFloat(document.getElementById('load').value);
+            const fos_pin = parseFloat(document.getElementById('fos_pin').value);
+            const fos_eye = parseFloat(document.getElementById('fos_eye').value);
+
+            fetch('http://127.0.0.1:5000/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ load: load, fos_pin: fos_pin, fos_eye: fos_eye })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById('output').innerHTML = '<b>Error:</b> ' + data.error;
+                    } else {
+                        let html = '<h3>Predicted Dimensions:</h3>';
+                        html += '<table border="1" cellspacing="0" cellpadding="5">';
+                        html += '<tr><th>Dimension</th><th>Value (mm)</th></tr>';
+
+                        for (const [key, val] of Object.entries(data)) {
+                            html += `<tr><td>${key}</td><td>${val}</td></tr>`;
+                        }
+
+                        html += '</table>';
+                        document.getElementById('output').innerHTML = html;
+
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('output').innerHTML = '<b>Error:</b> ' + err;
+                });
+        }
+
+        function clearFields() {
+            document.getElementById('load').value = '';
+            document.getElementById('fos_pin').value = '';
+            document.getElementById('fos_eye').value = '';
+            document.getElementById('output').innerHTML = '';
+        }
+    </script>
+</body>
+
+</html>
