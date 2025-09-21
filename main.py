@@ -4,7 +4,7 @@ from flask_cors import CORS
 import joblib
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})  # allow all origins
+CORS(app)  # allow all origins
 
 # Load trained model
 model = joblib.load("./rf_knuckle_joint_model.pkl")
