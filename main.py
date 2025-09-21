@@ -7,7 +7,7 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})  # allow all origins
 
 # Load trained model
-model = joblib.load("D:\\College\\TY\\Sem1\\ML\\tanmay\\rf_knuckle_joint_model.pkl")
+model = joblib.load("./rf_knuckle_joint_model.pkl")
 cols_y = ['d1', 'd2', 'd3', 't', 't1', 't2']
 
 @app.route('/predict', methods=['POST'])
