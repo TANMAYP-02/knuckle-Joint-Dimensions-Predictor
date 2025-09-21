@@ -159,7 +159,7 @@
             const fos_pin = parseFloat(document.getElementById('fos_pin').value);
             const fos_eye = parseFloat(document.getElementById('fos_eye').value);
 
-            fetch('http://127.0.0.1:5000/predict', {
+            fetch('https://knuckle-joint-dim.onrender.com/predict', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ load: load, fos_pin: fos_pin, fos_eye: fos_eye })
